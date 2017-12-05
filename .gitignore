@@ -1,0 +1,9 @@
+auth.py
+config.py
+python-telegram-bot/
+bin/
+local/
+lib/
+include/
+*.pyc
+*.py~
