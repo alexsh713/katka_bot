@@ -7,6 +7,8 @@ from telegram.ext import Updater, CommandHandler, RegexHandler
 from bittrex import Bittrex
 from time import sleep
 from subprocess import Popen, PIPE
+from answers import ans
+from random import choice
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -21,7 +23,12 @@ def start(bot, update):
     update.message.reply_text('Ага')
 
 def other(bot, update):
-    update.message.reply_text('А не знаю такого')
+    update.message.reply_text(choice(ans))
+
+
+def show_coin_price(bot, update, coin_name):
+    pass
+
 
 def bitcoin(bot, update):
     btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
@@ -34,12 +41,33 @@ def zcash(bot, update):
     output = zcash.json()[0]['price_usd'] + "$" + "       " + zcash.json()[0]['percent_change_24h'] + "%"
     update.message.reply_text(output)
 
+def monacoin(bot, update):
+    monacoin = requests.get('https://api.coinmarketcap.com/v1/ticker/monacoin/')
+    output = monacoin.json()[0]['price_usd'] + "$" + "       " + monacoin.json()[0]['percent_change_24h'] + "%"
+    update.message.reply_text(output)
+
+def ethereum(bot, update):
+    ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
+    output = ethereum.json()[0]['price_usd'] + "$" + "       " + ethereum.json()[0]['percent_change_24h'] + "%"
+    update.message.reply_text(output)
+
+
 
 def bittrex(bot, update):
     my_b = Bittrex(auth.api_key, auth.api_secret)
     balance = my_b.get_balance('ZEC')
     zec_value = balance['result']['Available']
     update.message.reply_text(zec_value)
+
+def show_balances(bot, update):
+    my_b = Bittrex(auth.api_key, auth.api_secret)
+    balances = my_b.get_balances()
+    for currency in balances['result']:
+        if currency['Available'] > 0:
+            curr = str(currency['Currency'])
+            bal = str(currency['Available'])
+            update.message.reply_text(curr + '  ' + bal)
+
 
 
 def status(bot, update):
@@ -110,14 +138,18 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("bitcoin", bitcoin))
     dp.add_handler(CommandHandler("zcash", zcash))
-    dp.add_handler(CommandHandler("bittrex", bittrex))
-    dp.add_handler(CommandHandler("status", status))
+    dp.add_handler(CommandHandler("monacoin", monacoin))
+    dp.add_handler(CommandHandler("ethereum", ethereum))
 
-    dp.add_handler(CommandHandler("set_polling", set_timer,
-                                  pass_args=True,
-                                  pass_job_queue=True,
-                                  pass_chat_data=True))
-    dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
+    #dp.add_handler(CommandHandler("bittrex", bittrex))
+    #dp.add_handler(CommandHandler("status", status))
+    dp.add_handler(CommandHandler("balances", show_balances))
+
+    # dp.add_handler(CommandHandler("set_polling", set_timer,
+    #                               pass_args=True,
+    #                               pass_job_queue=True,
+    #                               pass_chat_data=True))
+    # dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
     dp.add_handler(RegexHandler('^.', other))
     # log all errors
     dp.add_error_handler(error)
