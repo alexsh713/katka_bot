@@ -19,6 +19,7 @@ my_eth = 0.94889211
 foxy_btc = 0.01487875
 foxy_eth = 1.08679013
 
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
@@ -43,6 +44,7 @@ def usd_to_rub(usd):
 
 
 def start(bot, update):
+    #print update.message.chat_id
     update.message.reply_text('Ага')
 
 def other(bot, update):
@@ -76,115 +78,135 @@ def ethereum(bot, update):
 
 
 def my_btc_handler(bot, update):
-    btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
-    output = btc.json()[0]['price_usd']
-    usd = float(output)*my_btc
-    rub_btc = usd_to_rub(usd)
-    if rub_btc:
-        update.message.reply_text("Лаве " + str(rub_btc))
+    if update.message.chat_id in auth.chat_idx:
+        btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
+        output = btc.json()[0]['price_usd']
+        usd = float(output)*my_btc
+        rub_btc = usd_to_rub(usd)
+        if rub_btc:
+            update.message.reply_text("Лаве " + str(rub_btc).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+
     else:
-        update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+        update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
 
 def my_eth_handler(bot, update):
-    ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
-    output = ethereum.json()[0]['price_usd']
-    usd = float(output)*my_eth
-    rub_eth = usd_to_rub(usd)
-    if rub_eth:
-        update.message.reply_text("Лаве " + str(rub_eth))
+    if update.message.chat_id in auth.chat_idx:
+        ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
+        output = ethereum.json()[0]['price_usd']
+        usd = float(output)*my_eth
+        rub_eth = usd_to_rub(usd)
+        if rub_eth:
+            update.message.reply_text("Лаве " + str(rub_eth).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
     else:
-        update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
-
+        update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
 
 
 def foxy_btc_handler(bot, update):
-    btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
-    output = btc.json()[0]['price_usd']
-    usd = float(output)*foxy_btc
-    rub_btc = usd_to_rub(usd)
-    if rub_btc:
-        update.message.reply_text("Лаве " + str(rub_btc))
+    if update.message.chat_id in auth.chat_idx:
+        btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
+        output = btc.json()[0]['price_usd']
+        usd = float(output)*foxy_btc
+        rub_btc = usd_to_rub(usd)
+        if rub_btc:
+            update.message.reply_text("Лаве " + str(rub_btc).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
     else:
-        update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+        update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
 
 def foxy_eth_handler(bot, update):
-    ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
-    output = ethereum.json()[0]['price_usd']
-    usd = float(output)*foxy_eth
-    rub_eth = usd_to_rub(usd)
-    if rub_eth:
-        update.message.reply_text("Лаве " + str(rub_eth))
+    if update.message.chat_id in auth.chat_idx:
+        ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
+        output = ethereum.json()[0]['price_usd']
+        usd = float(output)*foxy_eth
+        rub_eth = usd_to_rub(usd)
+        if rub_eth:
+            update.message.reply_text("Лаве " + str(rub_eth).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
     else:
-        update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+        update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
 
 
-def bittrex(bot, update):
-    my_b = Bittrex(auth.api_key, auth.api_secret)
-    balance = my_b.get_balance('ZEC')
-    zec_value = balance['result']['Available']
-    update.message.reply_text(zec_value)
 
 def show_balances(bot, update):
-    my_b = Bittrex(auth.api_key, auth.api_secret)
-    balances = my_b.get_balances()
-    for currency in balances['result']:
-        if currency['Available'] > 0:
-            curr = str(currency['Currency'])
-            bal = str(currency['Available'])
-            update.message.reply_text(curr + '  ' + bal)
+    if update.message.chat_id in auth.masters_chat_idx:
+        my_b = Bittrex(auth.api_key, auth.api_secret)
+        balances = my_b.get_balances()
+        for currency in balances['result']:
+            if currency['Available'] > 0:
+                curr = str(currency['Currency'])
+                bal = str(currency['Available'])
+                update.message.reply_text(curr + '  ' + bal)
+    else:
+        update.message.reply_text("Не хватает прав. Попробуй другую команду")
 
 
 
 def status(bot, update):
-    data = 'iperf -c 192.168.62.65 -p 3389 -t1'
-    stdout = Popen(data, shell=True, stdout=PIPE).stdout
-    if stdout.read() != '':
-        update.message.reply_text('Катка в порядке')
-    else:
-        update.message.reply_text('Чет не так с каткой')
+    speeds = []
+
+    try:
+        response = requests.get(auth.katka_url)
+        result = response.json()['result']
+        for speed in result:
+            speeds.append(speed['speed_sps'])
+        #print speeds
+        if sum(speeds) == 0:
+            update.message.reply_text('Катка в ноль упала')
+    
+
+        
+    except ConnectionError:
+        update.message.reply_text('Чет катка не отвечает')
 
 
 
 
-def check_status(bot, job):
-    """Send the alarm message."""
-    data = 'iperf -c 192.168.62.65 -p 3389 -t1'
-    stdout = Popen(data, shell=True, stdout=PIPE).stdout
-    if stdout.read() == '':
-        bot.send_message(job.context, text='Катка подохла')
 
 
 def set_timer(bot, update, args, job_queue, chat_data):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
-    try:
-        # args[0] should contain the time for the timer in seconds
-        due = int(args[0])
-        if due < 0:
-            update.message.reply_text('Не могу задать это')
-            return
+    if chat_id not in auth.masters_chat_idx:
+        update.message.reply_text('Не хватает прав. Попробуй другую команду')
 
-        # Add job to queue
-        job = job_queue.run_repeating(check_status, interval=due, first=0, context=chat_id)
-        chat_data['job'] = job
+    else:
+        try:
+            # args[0] should contain the time for the timer in seconds
+            due = int(args[0])
+            if due < 0:
+                update.message.reply_text('Не могу задать это')
+                return
 
-        update.message.reply_text('Ага, запускаю')
+            # Add job to queue
+            job = job_queue.run_repeating(status, interval=due, first=0, context=chat_id)
+            chat_data['job'] = job
 
-    except (IndexError, ValueError):
-        update.message.reply_text('Usage: /set_polling <seconds>')
+            update.message.reply_text('Ага, запускаю')
+
+        except (IndexError, ValueError):
+            update.message.reply_text('Usage: /set_polling <seconds>')
 
 
 def unset(bot, update, chat_data):
     """Remove the job if the user changed their mind."""
-    if 'job' not in chat_data:
-        update.message.reply_text('А нет ниче')
-        return
+    if update.message.chat_id in auth.masters_chat_idx:
+        if 'job' not in chat_data:
+            update.message.reply_text('А нет ниче')
+            return
 
-    job = chat_data['job']
-    job.schedule_removal()
-    del chat_data['job']
+        job = chat_data['job']
+        job.schedule_removal()
+        del chat_data['job']
 
-    update.message.reply_text('Ага, выключил')
+        update.message.reply_text('Ага, выключил')
+    else:
+        update.message.reply_text('Не хватает прав. Попробуй другую команду')
 
 
 def error(bot, update, error):
@@ -206,19 +228,17 @@ def main():
     dp.add_handler(CommandHandler("monacoin", monacoin))
     dp.add_handler(CommandHandler("ethereum", ethereum))
 
-    #dp.add_handler(CommandHandler("bittrex", bittrex))
-    #dp.add_handler(CommandHandler("status", status))
     dp.add_handler(CommandHandler("balances", show_balances))
     dp.add_handler(CommandHandler("my_btc", my_btc_handler))
     dp.add_handler(CommandHandler("my_eth", my_eth_handler))
     dp.add_handler(CommandHandler("foxy_btc", foxy_btc_handler))
     dp.add_handler(CommandHandler("foxy_eth", foxy_eth_handler))
 
-    # dp.add_handler(CommandHandler("set_polling", set_timer,
-    #                               pass_args=True,
-    #                               pass_job_queue=True,
-    #                               pass_chat_data=True))
-    # dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
+    dp.add_handler(CommandHandler("set_polling", set_timer,
+                                  pass_args=True,
+                                  pass_job_queue=True,
+                                  pass_chat_data=True))
+    dp.add_handler(CommandHandler("unset", unset, pass_chat_data=True))
     dp.add_handler(RegexHandler('^.', other))
     # log all errors
     dp.add_error_handler(error)
