@@ -9,8 +9,16 @@ from time import sleep
 from subprocess import Popen, PIPE
 from answers import ans
 from random import choice
+from requests.exceptions import ConnectionError
 
 # Enable logging
+valute_url = 'https://www.cbr-xml-daily.ru/daily_json.js'
+
+my_btc = 0.05258306
+my_eth = 0.94889211
+foxy_btc = 0.01487875
+foxy_eth = 1.08679013
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
@@ -19,6 +27,21 @@ logger = logging.getLogger(__name__)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
+# ans['Valute']['USD']['Value']
+
+def usd_to_rub(usd):
+    try:
+        response = requests.get(valute_url)
+        ans = response.json() 
+        usd_price = ans['Valute']['USD']['Value']
+        return usd*usd_price
+    except ConnectionError:
+        return None
+
+
+
+
+
 def start(bot, update):
     update.message.reply_text('Ага')
 
@@ -51,6 +74,48 @@ def ethereum(bot, update):
     output = ethereum.json()[0]['price_usd'] + "$" + "       " + ethereum.json()[0]['percent_change_24h'] + "%"
     update.message.reply_text(output)
 
+
+def my_btc_handler(bot, update):
+    btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
+    output = btc.json()[0]['price_usd']
+    usd = float(output)*my_btc
+    rub_btc = usd_to_rub(usd)
+    if rub_btc:
+        update.message.reply_text("Лаве " + str(rub_btc))
+    else:
+        update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+
+def my_eth_handler(bot, update):
+    ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
+    output = ethereum.json()[0]['price_usd']
+    usd = float(output)*my_eth
+    rub_eth = usd_to_rub(usd)
+    if rub_eth:
+        update.message.reply_text("Лаве " + str(rub_eth))
+    else:
+        update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+
+
+
+def foxy_btc_handler(bot, update):
+    btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
+    output = btc.json()[0]['price_usd']
+    usd = float(output)*foxy_btc
+    rub_btc = usd_to_rub(usd)
+    if rub_btc:
+        update.message.reply_text("Лаве " + str(rub_btc))
+    else:
+        update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+
+def foxy_eth_handler(bot, update):
+    ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
+    output = ethereum.json()[0]['price_usd']
+    usd = float(output)*foxy_eth
+    rub_eth = usd_to_rub(usd)
+    if rub_eth:
+        update.message.reply_text("Лаве " + str(rub_eth))
+    else:
+        update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
 
 
 def bittrex(bot, update):
@@ -144,6 +209,10 @@ def main():
     #dp.add_handler(CommandHandler("bittrex", bittrex))
     #dp.add_handler(CommandHandler("status", status))
     dp.add_handler(CommandHandler("balances", show_balances))
+    dp.add_handler(CommandHandler("my_btc", my_btc_handler))
+    dp.add_handler(CommandHandler("my_eth", my_eth_handler))
+    dp.add_handler(CommandHandler("foxy_btc", foxy_btc_handler))
+    dp.add_handler(CommandHandler("foxy_eth", foxy_eth_handler))
 
     # dp.add_handler(CommandHandler("set_polling", set_timer,
     #                               pass_args=True,
