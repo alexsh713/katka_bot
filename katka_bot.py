@@ -211,14 +211,14 @@ def unset(bot, update, chat_data):
 
 def check_for_cases(bot, job):
     if rw.show_recent_cases():
-        bot.send_message(job.context, text= 'New case ' + str(rw.show_recent_cases()[0]) + ' ' + rw.show_recent_cases()[1])
-    # else:
-    #     bot.send_message(job.context, text='Нет ниче')
+        for case_id, case_subject in rw.show_recent_cases().items():
+            bot.send_message(job.context, text= 'New case ' + str(case_id) + ' ' + case_subject)
+
 
 def redmine_sheduler(bot, update, args, job_queue, chat_data):
     """Add a job to the queue."""
     chat_id = update.message.chat_id
-    if chat_id not in auth.masters_chat_idx:
+    if chat_id != auth.my_id:
         update.message.reply_text('Не хватает прав. Попробуй другую команду')
 
     else:
