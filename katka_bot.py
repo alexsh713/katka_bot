@@ -2,6 +2,7 @@
 import requests
 import auth
 import logging
+import red_watcher as rw
 from config import token
 from telegram.ext import Updater, CommandHandler, RegexHandler
 from bittrex import Bittrex
@@ -147,7 +148,7 @@ def show_balances(bot, update):
 
 
 
-def status(bot, update):
+def status(bot, job):
     speeds = []
 
     try:
@@ -157,12 +158,12 @@ def status(bot, update):
             speeds.append(speed['speed_sps'])
         #print speeds
         if sum(speeds) == 0:
-            update.message.reply_text('Катка в ноль упала')
+            bot.send_message(job.context, text='Катка в ноль упала')
     
 
         
     except ConnectionError:
-        update.message.reply_text('Чет катка не отвечает')
+        bot.send_message(job.context, text='Чет катка не отвечает')
 
 
 
@@ -208,6 +209,35 @@ def unset(bot, update, chat_data):
     else:
         update.message.reply_text('Не хватает прав. Попробуй другую команду')
 
+def check_for_cases(bot, job):
+    if rw.show_recent_cases():
+        bot.send_message(job.context, text= 'New case ' + str(rw.show_recent_cases()[0]) + ' ' + rw.show_recent_cases()[1])
+    # else:
+    #     bot.send_message(job.context, text='Нет ниче')
+
+def redmine_sheduler(bot, update, args, job_queue, chat_data):
+    """Add a job to the queue."""
+    chat_id = update.message.chat_id
+    if chat_id not in auth.masters_chat_idx:
+        update.message.reply_text('Не хватает прав. Попробуй другую команду')
+
+    else:
+        try:
+            # args[0] should contain the time for the timer in seconds
+            due = int(args[0])
+            if due < 0:
+                update.message.reply_text('Не могу задать это')
+                return
+
+            # Add job to queue
+            job = job_queue.run_repeating(check_for_cases, interval=due, first=0, context=chat_id)
+            chat_data['job1'] = job
+
+            update.message.reply_text('Запущено')
+
+        except (IndexError, ValueError):
+            update.message.reply_text('Usage: /redmine <seconds>')
+
 
 def error(bot, update, error):
     """Log Errors caused by Updates."""
@@ -235,6 +265,11 @@ def main():
     dp.add_handler(CommandHandler("foxy_eth", foxy_eth_handler))
 
     dp.add_handler(CommandHandler("set_polling", set_timer,
+                                  pass_args=True,
+                                  pass_job_queue=True,
+                                  pass_chat_data=True))
+
+    dp.add_handler(CommandHandler("redmine", redmine_sheduler,
                                   pass_args=True,
                                   pass_job_queue=True,
                                   pass_chat_data=True))
