@@ -211,8 +211,12 @@ def unset(bot, update, chat_data):
 
 def check_for_cases(bot, job):
     if rw.show_recent_cases():
-        for case_id, case_subject in rw.show_recent_cases().items():
-            bot.send_message(job.context, text= 'New case ' + str(case_id) + ' ' + case_subject)
+        for key in rw.show_recent_cases().viewkeys():
+            for j,k in rw.show_recent_cases()[key].items():
+                if j == 'update':
+                    bot.send_message(job.context, text= j + ' ' + k)
+                else:
+                    bot.send_message(job.context, text= 'New case ' + str(j) + ' ' + k)
 
 
 def redmine_sheduler(bot, update, args, job_queue, chat_data):
