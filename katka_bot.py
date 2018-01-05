@@ -17,8 +17,14 @@ valute_url = 'https://www.cbr-xml-daily.ru/daily_json.js'
 
 my_btc = 0.05258306
 my_eth = 0.94889211
+my_xrp = 83.8603371
+my_xmr = 1.39418595
 foxy_btc = 0.01487875
 foxy_eth = 1.08679013
+foxy_xrp = 84.2696629
+foxy_xmr = 0.5466565
+
+
 
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -105,6 +111,33 @@ def my_eth_handler(bot, update):
     else:
         update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
 
+def my_ripple_handler(bot, update):
+    if update.message.chat_id in auth.chat_idx:
+        ripple = requests.get('https://api.coinmarketcap.com/v1/ticker/ripple/')
+        output = ripple.json()[0]['price_usd']
+        usd = float(output)*my_xrp
+        rub_ripple = usd_to_rub(usd)
+        if rub_ripple:
+            update.message.reply_text("Лаве " + str(rub_ripple).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+    else:
+        update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
+
+
+def my_monero_handler(bot, update):
+    if update.message.chat_id in auth.chat_idx:
+        monero = requests.get('https://api.coinmarketcap.com/v1/ticker/monero/')
+        output = monero.json()[0]['price_usd']
+        usd = float(output)*my_xmr
+        rub_monero = usd_to_rub(usd)
+        if rub_monero:
+            update.message.reply_text("Лаве " + str(rub_monero).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+    else:
+        update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
+
 
 def foxy_btc_handler(bot, update):
     if update.message.chat_id in auth.chat_idx:
@@ -127,6 +160,34 @@ def foxy_eth_handler(bot, update):
         rub_eth = usd_to_rub(usd)
         if rub_eth:
             update.message.reply_text("Лаве " + str(rub_eth).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+    else:
+        update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
+
+
+def foxy_ripple_handler(bot, update):
+    if update.message.chat_id in auth.chat_idx:
+        ripple = requests.get('https://api.coinmarketcap.com/v1/ticker/ripple/')
+        output = ripple.json()[0]['price_usd']
+        usd = float(output)*foxy_xrp
+        rub_ripple = usd_to_rub(usd)
+        if rub_ripple:
+            update.message.reply_text("Лаве " + str(rub_ripple).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
+    else:
+        update.message.reply_text("Не хватает прав для выполения. Попробуй с другой командой")
+
+
+def foxy_monero_handler(bot, update):
+    if update.message.chat_id in auth.chat_idx:
+        monero = requests.get('https://api.coinmarketcap.com/v1/ticker/monero/')
+        output = monero.json()[0]['price_usd']
+        usd = float(output)*foxy_xmr
+        rub_monero = usd_to_rub(usd)
+        if rub_monero:
+            update.message.reply_text("Лаве " + str(rub_monero).split('.')[0])
         else:
             update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd))
     else:
@@ -265,8 +326,13 @@ def main():
     dp.add_handler(CommandHandler("balances", show_balances))
     dp.add_handler(CommandHandler("my_btc", my_btc_handler))
     dp.add_handler(CommandHandler("my_eth", my_eth_handler))
+    dp.add_handler(CommandHandler("my_ripple", my_ripple_handler))
+    dp.add_handler(CommandHandler("my_monero", my_monero_handler))
+    
     dp.add_handler(CommandHandler("foxy_btc", foxy_btc_handler))
     dp.add_handler(CommandHandler("foxy_eth", foxy_eth_handler))
+    dp.add_handler(CommandHandler("foxy_ripple", foxy_ripple_handler))
+    dp.add_handler(CommandHandler("foxy_monero", foxy_monero_handler))
 
     dp.add_handler(CommandHandler("set_polling", set_timer,
                                   pass_args=True,
