@@ -336,7 +336,7 @@ def on_pc(bot,update):
         try:
             r = requests.get('http://192.168.88.1:1488')
         except ConnectionError:
-            update.message.reply_text('Ага, послал запрос на включение')
+            update.message.reply_text('Ага, включил')
 
 
 def off_pc(bot,update):
