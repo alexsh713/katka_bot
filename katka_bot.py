@@ -84,6 +84,22 @@ def ethereum(bot, update):
     update.message.reply_text(output)
 
 
+def show_coin_price(bot, update, args):
+    
+    try:
+        coin_name = args[0]
+        coin = requests.get('https://api.coinmarketcap.com/v1/ticker/' + coin_name)
+        if coin.status_code == 404:
+            update.message.reply_text('coin not found')
+        else:
+            output = coin.json()[0]['price_usd'] + "$" + "       " + coin.json()[0]['percent_change_24h'] + "%"
+            update.message.reply_text(output)
+
+    except (IndexError, ValueError):
+            update.message.reply_text('Usage: /coin <coin_name>')
+
+
+
 def my_btc_handler(bot, update):
     if update.message.chat_id in auth.chat_idx:
         btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
@@ -233,6 +249,7 @@ def status(bot, job):
 
 def set_timer(bot, update, args, job_queue, chat_data):
     """Add a job to the queue."""
+
     chat_id = update.message.chat_id
     if chat_id not in auth.masters_chat_idx:
         update.message.reply_text('Не хватает прав. Попробуй другую команду')
@@ -282,6 +299,7 @@ def check_for_cases(bot, job):
 
 def redmine_sheduler(bot, update, args, job_queue, chat_data):
     """Add a job to the queue."""
+
     chat_id = update.message.chat_id
     if chat_id != auth.my_id:
         update.message.reply_text('Не хватает прав. Попробуй другую команду')
@@ -349,6 +367,7 @@ def main():
     dp.add_handler(CommandHandler("zcash", zcash))
     dp.add_handler(CommandHandler("monacoin", monacoin))
     dp.add_handler(CommandHandler("ethereum", ethereum))
+    dp.add_handler(CommandHandler("coin", show_coin_price, pass_args=True))
 
     dp.add_handler(CommandHandler("balances", show_balances))
     dp.add_handler(CommandHandler("my_btc", my_btc_handler))
