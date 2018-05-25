@@ -331,6 +331,33 @@ def error(bot, update, error):
     logger.warning('Update "%s" caused error "%s"', update, error)
 
 
+def on_pc(bot,update):
+    chat_id = update.message.chat_id
+    if chat_id != auth.my_id:
+        update.message.reply_text('Не хватает прав. Попробуй другую команду')
+
+    else:
+        try:
+            r = requests.get('http://192.168.88.1:1488')
+        except ConnectionError:
+            update.message.reply_text('Ага, включил')
+
+
+def off_pc(bot,update):
+    chat_id = update.message.chat_id
+    if chat_id != auth.my_id:
+        update.message.reply_text('Не хватает прав. Попробуй другую команду')
+
+    else:
+        try:
+            r = requests.get('http://192.168.88.79:3000')
+        except ConnectionError:
+            update.message.reply_text('Ага, выключил')
+
+
+
+
+
 def main():
     """Run bot."""
     updater = Updater(token)
@@ -357,6 +384,8 @@ def main():
     dp.add_handler(CommandHandler("foxy_ripple", foxy_ripple_handler))
     dp.add_handler(CommandHandler("foxy_monero", foxy_monero_handler))
     dp.add_handler(CommandHandler("spent", spent_time))
+    dp.add_handler(CommandHandler("on", on_pc))
+    dp.add_handler(CommandHandler("off", off_pc))
 
     dp.add_handler(CommandHandler("set_polling", set_timer,
                                   pass_args=True,
