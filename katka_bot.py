@@ -226,7 +226,7 @@ def show_balances(bot, update):
 
 def spent_time(bot, update):
     answer = str(DST.spent_time())
-    update.message.reply_text("Spent time " + answer)
+    update.message.reply_text("Spent time for today " + answer)
 
 
 def status(bot, job):
