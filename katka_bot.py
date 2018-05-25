@@ -4,6 +4,7 @@ import auth
 import logging
 import red_watcher as rw
 import day_spent_time as DST
+import spent_time as ST
 from config import token
 from telegram.ext import Updater, CommandHandler, RegexHandler
 from bittrex import Bittrex
@@ -228,6 +229,9 @@ def spent_time(bot, update):
     answer = str(DST.spent_time())
     update.message.reply_text("Spent time for today " + answer)
 
+def send_report(bot, update):
+     bot.send_document(chat_id=update.message.chat_id, document=open(str(ST.create_report()), 'rb'), timeout=5)
+
 
 def status(bot, job):
     speeds = []
@@ -384,6 +388,7 @@ def main():
     dp.add_handler(CommandHandler("foxy_ripple", foxy_ripple_handler))
     dp.add_handler(CommandHandler("foxy_monero", foxy_monero_handler))
     dp.add_handler(CommandHandler("spent", spent_time))
+    dp.add_handler(CommandHandler("report", send_report))
     dp.add_handler(CommandHandler("on", on_pc))
     dp.add_handler(CommandHandler("off", off_pc))
 
