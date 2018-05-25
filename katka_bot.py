@@ -3,6 +3,7 @@ import requests
 import auth
 import logging
 import red_watcher as rw
+import day_spent_time as DST
 from config import token
 from telegram.ext import Updater, CommandHandler, RegexHandler
 from bittrex import Bittrex
@@ -25,7 +26,7 @@ foxy_xrp = 84.2696629
 foxy_xmr = 0.5466565
 
 
-
+#request_kwargs={'proxy_url': 'socks5://dlink:paleno228@cergo666.tk:1080'}
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -223,6 +224,9 @@ def show_balances(bot, update):
     else:
         update.message.reply_text("Не хватает прав. Попробуй другую команду")
 
+def spent_time(bot, update):
+    answer = str(DST.spent_time())
+    update.message.reply_text("Spent time " + answer)
 
 
 def status(bot, job):
@@ -352,6 +356,7 @@ def main():
     dp.add_handler(CommandHandler("foxy_eth", foxy_eth_handler))
     dp.add_handler(CommandHandler("foxy_ripple", foxy_ripple_handler))
     dp.add_handler(CommandHandler("foxy_monero", foxy_monero_handler))
+    dp.add_handler(CommandHandler("spent", spent_time))
 
     dp.add_handler(CommandHandler("set_polling", set_timer,
                                   pass_args=True,
