@@ -1,13 +1,17 @@
 import datetime
 from redmine import Redmine
 from auth import *
+from requests.exceptions import ConnectionError
 
-redmine = Redmine(redmine_url, key = redmine_api_key)
 
 
 
 
 def spent_time():
+    try:
+        redmine = Redmine(redmine_url, key = redmine_api_key)
+    except ConnectionError:
+        return False
     user = redmine.user.get(user_id)
     spent_time = user.time_entries
     total_spent_time = []

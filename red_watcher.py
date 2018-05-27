@@ -1,6 +1,7 @@
 import datetime
 from redmine import Redmine
 from auth import redmine_url, redmine_api_key, user_id
+from requests.exceptions import ConnectionError
 
 redmine = Redmine(redmine_url, key = redmine_api_key)
 
@@ -28,7 +29,10 @@ def get_last_note(issue):
 
 
 def show_recent_cases():
-    user = redmine.user.get(user_id)
+    try:
+        user = redmine.user.get(user_id)
+    except ConnectionError:
+        return False
     user_issues = user.issues
     issue_list = {}
     for issue in user_issues:

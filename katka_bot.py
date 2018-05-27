@@ -227,7 +227,10 @@ def show_balances(bot, update):
 
 def spent_time(bot, update):
     answer = str(DST.spent_time())
-    update.message.reply_text("Spent time for today " + answer)
+    if answer:
+        update.message.reply_text("Spent time for today " + answer)
+    else:
+        update.message.reply_text("can't connect to redmine")
 
 def send_report(bot, update):
      bot.send_document(chat_id=update.message.chat_id, document=open(str(ST.create_report()), 'rb'), timeout=5)

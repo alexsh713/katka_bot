@@ -5,17 +5,13 @@ from redmine import Redmine
 from sys import exit
 from openpyxl.styles import PatternFill
 from auth import *
+from requests.exceptions import ConnectionError
 
 wb = Workbook()
 ws1 = wb.active
 colorFill = PatternFill(start_color='0073C2FB', end_color='0073C2FB', fill_type='solid')
 start_date = datetime.datetime.now() - datetime.timedelta(7)
 
-
-redmine = Redmine(redmine_url, key = redmine_api_key)
-user = redmine.user.get(user_id)
-user_for_xlsx = user.lastname + ' ' + user.firstname
-dest_filename = os.path.join("reports", start_date.strftime("%d.%m.%Y") + "-" + datetime.datetime.now().strftime("%d.%m.%Y") + "_report_" + user.login + ".xlsx")
 
 spent_time = user.time_entries
 total_spent_time = []
@@ -24,6 +20,13 @@ xlsx_data = []
 
 
 def create_report():
+    try:
+        redmine = Redmine(redmine_url, key = redmine_api_key)
+    except ConnectionError:
+        return False
+    user = redmine.user.get(user_id)
+    user_for_xlsx = user.lastname + ' ' + user.firstname
+    dest_filename = os.path.join("reports", start_date.strftime("%d.%m.%Y") + "-" + datetime.datetime.now().strftime("%d.%m.%Y") + "_report_" + user.login + ".xlsx")
     for entry in spent_time:
         delta = (datetime.datetime.now() - entry.created_on).days
         if delta <= 7:
