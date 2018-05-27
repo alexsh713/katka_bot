@@ -226,10 +226,10 @@ def show_balances(bot, update):
         update.message.reply_text("Не хватает прав. Попробуй другую команду")
 
 def spent_time(bot, update):
-    answer = str(DST.spent_time())
-    if answer:
+    try:
+        answer = str(DST.spent_time())
         update.message.reply_text("Spent time for today " + answer)
-    else:
+    except:
         update.message.reply_text("can't connect to redmine")
 
 def send_report(bot, update):
