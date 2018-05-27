@@ -31,7 +31,7 @@ def get_last_note(issue):
 def show_recent_cases():
     try:
         user = redmine.user.get(user_id)
-    except ConnectionError:
+    except:
         return False
     user_issues = user.issues
     issue_list = {}

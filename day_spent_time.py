@@ -10,7 +10,7 @@ from requests.exceptions import ConnectionError
 def spent_time():
     try:
         redmine = Redmine(redmine_url, key = redmine_api_key)
-    except ConnectionError:
+    except:
         return False
     user = redmine.user.get(user_id)
     spent_time = user.time_entries

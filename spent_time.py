@@ -21,7 +21,7 @@ xlsx_data = []
 def create_report():
     try:
         redmine = Redmine(redmine_url, key = redmine_api_key)
-    except ConnectionError:
+    except:
         return False
     user = redmine.user.get(user_id)
     spent_time = user.time_entries
