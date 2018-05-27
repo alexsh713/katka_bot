@@ -13,7 +13,6 @@ colorFill = PatternFill(start_color='0073C2FB', end_color='0073C2FB', fill_type=
 start_date = datetime.datetime.now() - datetime.timedelta(7)
 
 
-spent_time = user.time_entries
 total_spent_time = []
 xlsx_data = []
 
@@ -25,6 +24,7 @@ def create_report():
     except ConnectionError:
         return False
     user = redmine.user.get(user_id)
+    spent_time = user.time_entries
     user_for_xlsx = user.lastname + ' ' + user.firstname
     dest_filename = os.path.join("reports", start_date.strftime("%d.%m.%Y") + "-" + datetime.datetime.now().strftime("%d.%m.%Y") + "_report_" + user.login + ".xlsx")
     for entry in spent_time:
