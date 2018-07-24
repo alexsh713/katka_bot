@@ -86,6 +86,52 @@ def ethereum(bot, update):
     update.message.reply_text(output)
 
 
+def my_bittrex():
+    total = []
+    my_b = Bittrex(auth.api_key, auth.api_secret)
+    balances = my_b.get_balances()
+    for currency in balances['result']:
+        if currency['Available'] > 0:
+            curr = str(currency['Currency'])
+            if curr == 'BTC':
+                bal = currency['Available'] - my_btc - foxy_btc
+                btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/')
+                output = btc.json()[0]['price_usd']
+                usd = float(output)*bal*0.5
+                rub_btc = usd_to_rub(usd)
+                total.append(rub_btc)
+            elif curr == 'ETH':
+                bal = currency['Available'] - my_eth - foxy_eth
+                ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/')
+                output = ethereum.json()[0]['price_usd']
+                usd = float(output)*bal*0.5
+                rub_eth = usd_to_rub(usd)
+                total.append(rub_eth)
+            elif curr == 'DCR':
+                bal = currency['Available']
+                decred = requests.get('https://api.coinmarketcap.com/v1/ticker/decred/')
+                output = decred.json()[0]['price_usd']
+                usd = float(output)*bal*0.5
+                rub_decred = usd_to_rub(usd)
+                total.append(rub_decred)
+
+            elif curr == 'ZEC':
+                bal = currency['Available']
+                zcash = requests.get('https://api.coinmarketcap.com/v1/ticker/zcash/')
+                output = zcash.json()[0]['price_usd']
+                usd = float(output)*bal*0.5
+                rub_zcash = usd_to_rub(usd)
+                total.append(rub_zcash)
+
+        else:
+            pass
+    
+
+
+    return int(sum(total))
+
+
+
 def show_coin_price(bot, update, args):
     
     try:
@@ -224,6 +270,26 @@ def show_balances(bot, update):
                 update.message.reply_text(curr + '  ' + bal)
     else:
         update.message.reply_text("Не хватает прав. Попробуй другую команду")
+
+
+def total(bot, update):
+    if update.message.chat_id in auth.chat_idx:
+        btc = requests.get('https://api.coinmarketcap.com/v1/ticker/bitcoin/').json()[0]['price_usd']
+        ethereum = requests.get('https://api.coinmarketcap.com/v1/ticker/ethereum/').json()[0]['price_usd']
+        monero = requests.get('https://api.coinmarketcap.com/v1/ticker/monero/').json()[0]['price_usd']
+        ripple = requests.get('https://api.coinmarketcap.com/v1/ticker/ripple/').json()[0]['price_usd']
+
+        usd_total = float(btc)*my_btc + float(btc)*foxy_btc + float(ethereum)*my_eth + float(ethereum)*foxy_eth + \
+                    float(monero)*my_xmr + float(monero)*foxy_xmr + float(ripple)*my_xrp + float(ripple)*foxy_xrp
+
+        rub_total = usd_to_rub(usd_total) + my_bittrex()
+        if rub_total:
+            update.message.reply_text("Лаве " + str(rub_total).split('.')[0])
+        else:
+            update.message.reply_text("Чет не могу посчитать в рублях, вот в баксах " + str(usd_total))
+
+    else:
+        update.message.reply_text("Не хватает прав. Попробуй другую команду")     
 
 def spent_time(bot, update):
     try:
@@ -394,6 +460,7 @@ def main():
     dp.add_handler(CommandHandler("report", send_report))
     dp.add_handler(CommandHandler("on", on_pc))
     dp.add_handler(CommandHandler("off", off_pc))
+    dp.add_handler(CommandHandler("total", total))
 
     dp.add_handler(CommandHandler("set_polling", set_timer,
                                   pass_args=True,
