@@ -27,7 +27,7 @@ foxy_xrp = 84.2696629
 foxy_xmr = 0.5466565
 
 
-#request_kwargs={'proxy_url': 'socks5://dlink:paleno228@cergo666.tk:1080'}
+requests_kwargs={'proxy_url': 'socks5://195.201.139.89:59020', 'urllib3_proxy_kwargs':{'username': 'proxy', 'password': 'nuiotlichno'}}
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -367,7 +367,7 @@ def off_pc(bot,update):
 
 def main():
     """Run bot."""
-    updater = Updater(token)
+    updater = Updater(token, request_kwargs=requests_kwargs)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
