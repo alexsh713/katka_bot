@@ -1,9 +1,9 @@
 import datetime
 import os
-from openpyxl import Workbook
+#from openpyxl import Workbook
 from redmine import Redmine
 from sys import exit
-from openpyxl.styles import PatternFill
+#from openpyxl.styles import PatternFill
 from auth import *
 from requests.exceptions import ConnectionError
 
